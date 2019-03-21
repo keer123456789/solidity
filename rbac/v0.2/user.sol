@@ -1,9 +1,8 @@
-pragma solidity ^0.4.24 <0.6.0;
+pragma solidity ^0.4.24;
 
 import "./role.sol";
-import "./ownable.sol";
-
 contract User is Role{
+   uint private userCount;
     struct user{
         uint8 status;
         address add;
@@ -23,6 +22,8 @@ contract User is Role{
         addToUser[msg.sender].userId = "admin";
         addToUser[msg.sender].fUserId = "root";
         userIdToAddress["admin"] = msg.sender;
+        adds.push(msg.sender);
+        userCount++;
     }
     
     //检查角色和上级用户的角色是否匹配
@@ -46,6 +47,7 @@ contract User is Role{
         adds.push(msg.sender);
         userIdToAddress[_userId] = msg.sender;
         emit newRegisterUser(addToUser[msg.sender].userId, "",addToUser[msg.sender].add, addToUser[msg.sender].status);
+        userCount++;
         return (addToUser[msg.sender].add, addToUser[msg.sender].userId, addToUser[msg.sender].status);
     }
     
@@ -106,6 +108,10 @@ contract User is Role{
     //获得用户的权限
     function getPower(string userId)public view returns(uint[]){
         return nameToRole[addToUser[userIdToAddress[userId]].roleName].roleId;
+    }
+    //获得所有用户地址 
+    function getUserCount()public view returns(address[]){
+        return adds;
     }
 }
     
