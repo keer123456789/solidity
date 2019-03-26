@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24 <0.6.0;
 
-import "./ownable.sol";
+import "./Ownable.sol";
 
 contract Power is Ownable{
     struct power{
@@ -21,6 +21,7 @@ contract Power is Ownable{
         powerCount++;
     }
     
+    event newPower(uint _powerID, bool _isUse, string _powerName, string _powerInfo);
     
    
     modifier exit(uint _powerID){
@@ -50,17 +51,21 @@ contract Power is Ownable{
         powerIDTOpower[_powerID].powerInfo = _powerInfo;
         powerIds.push(_powerID);
         powerCount++;
+        emit newPower(powerIDTOpower[_powerID].powerID, powerIDTOpower[_powerID].isUse, powerIDTOpower[_powerID].powerName,  powerIDTOpower[_powerID].powerInfo );
     }
     
     function changePowername(uint _powerID,string _newName)external exit(_powerID) use(_powerID){
         powerIDTOpower[_powerID].powerName = _newName;
+         emit changeStatus(true);
     }
     
     function changeUnUse(uint _powerID)external exit(_powerID) use(_powerID){
          powerIDTOpower[_powerID].isUse = false;
+          emit changeStatus(true);
     }
     function changePowerInfo(uint _powerID,string _powerInfo)external exit(_powerID) use(_powerID){
          powerIDTOpower[_powerID].powerInfo = _powerInfo;
+          emit changeStatus(true);
     }
     function getPowerInfoBypowerId(uint _powerID)external view returns(uint _powerId, string _powerName, string _powerInfo, bool _use){
         return (powerIDTOpower[_powerID].powerID,powerIDTOpower[_powerID].powerName, powerIDTOpower[_powerID].powerInfo, powerIDTOpower[_powerID].isUse);

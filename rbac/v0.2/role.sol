@@ -1,6 +1,6 @@
 pragma solidity ^0.4.24 <0.6.0;
-import "./ownable.sol";
-import "./power.sol";
+import "./Ownable.sol";
+import "./Power.sol";
 
 contract Role is Power{
     
@@ -16,7 +16,7 @@ contract Role is Power{
     string[] private roleNames;
   
    
-    event newCreateEvent(uint[] _roleId, string  _fName, string _name);
+    event newCreateEvent(uint _roleId, string  _fName, string _name);
    
     function Role() public {
         nameToRole["root"].roleId.push(1);
@@ -41,38 +41,35 @@ contract Role is Power{
 	 * 如果父id不存在，抛出异常
 	 * 如果不是合约创建者调用方法，抛出异常
 	 */
-    function createRole(uint[] _roleId, string _fName, string _name) external isExitRole(_fName)  onlyOwner() {
-        for(uint b;b<_roleId.length;a++){
-            require(powerIDTOpower[_roleId[b]].powerID == _roleId[b]);
-            
-        }
-        
-        for(uint a;a<_roleId.length;a++){
-            nameToRole[_name].roleId.push(_roleId[a]);
-        }
+    function createRole(uint _roleId, string _fName, string _name) external isExitRole(_fName)  onlyOwner() {
+        require(powerIDTOpower[_roleId].powerID == _roleId);
+
+        nameToRole[_name].roleId.push(_roleId);
         nameToRole[_name].fName =  _fName;
         nameToRole[_name].name = _name;
         roleCount++;
-        roleNames.push("_name");
+        roleNames.push(_name);
         emit newCreateEvent(_roleId,  _fName, _name);
     }
 
     
      //修改角色权限
-    function changeRoleId(string _name, uint[] _newRoleId) onlyOwner() external{
-        for(uint a;a<_newRoleId.length;a++){
-            nameToRole[_name].roleId.push(_newRoleId[a]);
-        }
+    function changeRoleId(string _name, uint _newRoleId) onlyOwner() external{
+        require(powerIDTOpower[_newRoleId].powerID == _newRoleId);
+        nameToRole[_name].roleId.push(_newRoleId);
+        emit changeStatus(true);
     }
     
     //修改角色的上级角色
     function changeFName(string _name, string _newFName)onlyOwner() isExitRole(_newFName) external{
         nameToRole[_name].fName = _newFName;
+        emit changeStatus(true);
     }
     //修改角色的权限和上级角色
     function changeRoleIdAndFNameId(string _name, uint _newRoleId, string _newFName) isExitRole(_newFName) onlyOwner() external{
         nameToRole[_name].roleId.push( _newRoleId);
         nameToRole[_name].fName = _newFName;
+        emit changeStatus(true);
     }
     
     
@@ -90,14 +87,5 @@ contract Role is Power{
     function getRoleNameByIndex(uint _index)view external returns(string _name){
         return roleNames[_index];
     }
-    
-    function getMinPower() view external returns(uint){
-        return minPower;
-    }
-    
-  
-   
- 
-    
-    
+
 }
